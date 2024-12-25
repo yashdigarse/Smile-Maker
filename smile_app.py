@@ -13,13 +13,16 @@ def add_smile(image):
     faces = detector(gray)
     for face in faces:
         landmarks = predictor(gray, face)
-        for n in range(48, 61):  # Mouth landmarks
-            x = landmarks.part(n).x
-            y = landmarks.part(n).y
-            cv2.circle(image, (x, y), 2, (0, 255, 0), -1)
-        # Modify landmarks to create a smile effect (simplified example)
-        landmarks.part(48).y += 10
-        landmarks.part(54).y += 10
+        # Get coordinates of mouth landmarks
+        mouth_points = [(landmarks.part(n).x, landmarks.part(n).y) for n in range(48, 61)]
+        mouth_points = np.array(mouth_points, dtype=np.int32)
+
+        # Create a smile effect by moving the corners of the mouth upwards
+        mouth_points[3][1] -= 10  # Left corner
+        mouth_points[9][1] -= 10  # Right corner
+
+        # Draw the modified mouth on the image
+        cv2.polylines(image, [mouth_points], isClosed=True, color=(0, 255, 0), thickness=2)
     return image
 
 st.title("Smile Maker")
